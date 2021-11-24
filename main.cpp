@@ -1,11 +1,21 @@
 /*
 CS211 Assignment 4
+
 Program simulates Conway's Game of Life
+
 All cells should have 8 neighbours, even the ones on the border. For this purpose, the 2-dim array is considered as if it was wrapped around, or a sort of sphere.
+
+bool gridAlive to determine the living cells
+int gridN to determine the neighbours
+if(gridN[i][j] == 2 or 3) -> populate gridAlive[i][j] = 1
+else gridN[i][j] == 1 or 4 -> gridAlive[i][j] = 0
+
 */
 
 #include <iostream>
 #include <string>
+#include <ctime>
+#include <cstdlib>
 
 using namespace std;
 
@@ -14,8 +24,89 @@ const int MAXGEN = 3; // maximum no. of generations
 const int n = 10;    // no. of rows 
 const int m = 10;    // no. of colums
 
+void initialize() {
+
+}
+
+void initializeRandom() {
+	srand(time(0));
+
+	int den;
+	cout << "What is the density?" << endl;
+	cin >> den;	
+
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < m; j++) {
+			int randN = (rand() % 100) + 1;
+			if (randN <= den) {
+				//populate cell
+			}
+		}
+	}
+	
+}
+
+
+/*
+check the 9 tile for a given cell location
+returns the number of neighbors
+*/
+int calcN(int a, int b) {
+	int sum = 0;
+	
+	/*
+	in a normal case were 0 > a--/a++ or b--/b++ > 10
+	a--,b--
+	a--,b
+	a--,b++
+	a,b--
+	a,b
+	a,b++
+	a++,b--
+	a++,b
+	a++,b++
+	
+	if a-- or b-- < 0
+	set a,b = 9
+
+	if a++ or b++ == 10
+	set a,b = 0
+
+	after each condition, if gridAlive == true sum++	
+	*/
+	
+	return sum;
+}
+
+//
+void generateCell() {
+	
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < m; j++) {			
+			calcN(i, j);
+		}		
+	}
+
+
+}
+
+
+
+void print() {
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < m; j++) {
+			cout << " ";
+
+		}
+		cout << endl;
+	}
+}
+
 int main() {
-	int grid[n][m];
+	
+	bool gridAlive[n][m];
+	int gridN[n][m];
+	
 	
 	/*
 	initialize(grid);     // you should call either initialize, or initialize2
