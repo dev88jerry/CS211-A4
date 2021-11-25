@@ -1,5 +1,6 @@
 /*
 CS211 Assignment 4
+Dec 12 2021
 
 Program simulates Conway's Game of Life
 
@@ -60,7 +61,7 @@ int calcN(int a, int b) {
 	a--,b
 	a--,b++
 	a,b--
-	a,b
+	a,b-> no need to check
 	a,b++
 	a++,b--
 	a++,b
@@ -83,13 +84,36 @@ void generateCell() {
 	
 	for (int i = 0; i < n; i++) {
 		for (int j = 0; j < m; j++) {			
-			calcN(i, j);
+			int neighbor = calcN(i, j);
+			/*
+			if gridAlive[i][j] == true 
+				if neigbhor == 1 ||  > 3
+					gridAlive[i][j] = false
+			else // when gridAlive = false
+				if neigbhor == 3			
+					gridAlive[i][j] = true
+			*/
+
 		}		
 	}
 
 
 }
 
+int population() {
+	int pop = 0;
+	
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < m; j++) {
+			//if(gridA == true)
+				pop++;
+
+		}
+		
+	}
+
+	return pop;
+}
 
 
 void print() {
@@ -104,9 +128,7 @@ void print() {
 
 int main() {
 	
-	bool gridAlive[n][m];
-	int gridN[n][m];
-	
+	bool gridAlive[n][m];	
 	
 	/*
 	initialize(grid);     // you should call either initialize, or initialize2
