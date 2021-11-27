@@ -1,6 +1,8 @@
 /*
 CS211 Assignment 4
 
+Dec 12 2021
+
 Program simulates Conway's Game of Life
 
 All cells should have 8 neighbours, even the ones on the border. For this purpose, the 2-dim array is considered as if it was wrapped around, or a sort of sphere.
@@ -106,7 +108,7 @@ int calcN(const int a, const int b, bool gridA[][m]) {
 			}
 		}
 		for (int j = b - 1; j <= b + 1; j++) {
-			int i = 0;
+			int i = overA;
 			if (gridA[i][j] == true && i != a && j != b) {
 				sum++;
 			}
@@ -123,7 +125,7 @@ int calcN(const int a, const int b, bool gridA[][m]) {
 			}
 		}
 		for (int j = b - 1; j <= b + 1; j++) {
-			int i = 9;
+			int i = underA;
 			if (gridA[i][j] == true && i != a && j != b) {
 				sum++;
 			}
@@ -140,7 +142,7 @@ int calcN(const int a, const int b, bool gridA[][m]) {
 			}
 		}
 		for (int i = a - 1; i <= a + 1; i++) {
-			int j = 0;
+			int j = overB;
 			if (gridA[i][j] == true && i != a && j != b) {
 				sum++;
 			}
@@ -157,7 +159,7 @@ int calcN(const int a, const int b, bool gridA[][m]) {
 			}
 		}
 		for (int i = a - 1; i <= a + 1; i++) {
-			int j = 9;
+			int j = underB;
 			if (gridA[i][j] == true && i != a && j != b) {
 				sum++;
 			}
@@ -165,16 +167,86 @@ int calcN(const int a, const int b, bool gridA[][m]) {
 	}
 	else if (overA == 0 && underA == 100 && overB == 0 && underB == 100) {
 		//1010
+		//8,9,0->a
+		//8,9,0->b
 	}
 
 	else if (overA == 0 && underA == 100 && overB == 100 && underB == 9) {
 		//1001
+		//8,9,0->a
+		//9,0,1->b
 	}
 	else if (overA == 100 && underA == 9 && overB == 100 && underB == 9) {
 		//0101
+		//9,0,1->a
+		//9,0,1->b
+		/*
+		9,9->9,0->9,1
+		0,9->0,0->0,1
+		1,9->1,0->1,1
+		*/
+		for (int i = -1; i <= 1; i++) {
+			if (i == -1) {				
+				for (int j = -1; j <= 1; j++) {
+					if (j == -1) {
+						if (gridA[underA][underB] == true)
+							sum++;
+					}
+					else {
+						if (gridA[underA][j] == true)
+							sum++;
+					}					
+				}
+			}
+			else {
+				for (int j = -1; j <= 1; j++) {
+					if (j == -1) {
+						if (gridA[i][underB] == true)
+							sum++;
+					}
+					else {
+						if (gridA[i][j] == true)
+							sum++;
+					}
+				}
+			}
+		}
 	}
 	else if (overA == 100 && underA == 9 && overB == 0 && underB == 100) {
 		//0110
+		//9,0,1->a
+		//8,9,0->b
+		/*
+		9,8->9,9->9,0
+		0,8->0,9->0,0
+		1,8->1,9->1,0
+		*/
+		for (int i = -1; i <= 1; i++) {
+			if (i == -1) {
+				for (int j = 8; j <= 10; j++) {
+					if (j == 10) {
+						if (gridA[underA][overB] == true)
+							sum++;
+					}
+					else {
+						if (gridA[underA][j] == true)
+							sum++;
+					}
+				}
+			}
+			else {
+				for (int j = 8; j <= 10; j++) {
+					if (j == 10) {
+						if (gridA[i][overB] == true)
+							sum++;
+					}
+					else {
+						if (gridA[i][j] == true)
+							sum++;
+					}
+				}
+			}
+		}
 	}
 
 	/*
@@ -222,16 +294,12 @@ void generateCell(int gridN[][m], bool gridA[][m]) {
 
 	for (int i = 0; i < n; i++) {
 		for (int j = 0; j < m; j++) {
-			int neighbor = calcN(i, j, gridA);
-			/*
-			reset gridN[i][j]= 0;
-
-			if gridAlive[i][j] == true
-			gridN[i][j] = neighbor;
-			else // when gridAlive = false
-			grid[i][j] = neighbor + 100;
-			*/
-
+			int neighbor = calcN(i, j, gridA);			
+			gridN[i][j]= 0;
+			if (gridA[i][j] == true)
+				gridN[i][j] = neighbor;
+			else
+				gridN[i][j] = neighbor + 100;
 		}
 	}
 }
@@ -240,17 +308,13 @@ void generateCell(int gridN[][m], bool gridA[][m]) {
 void newGen(int gridN[][m], bool gridA[][m]) {
 
 	for (int i = 0; i < n; i++) {
-		for (int j = 0; j < m; j++) {
-			/*
-			reset gridAlive[i][j] = false
+		for (int j = 0; j < m; j++) {			
+			gridA[i][j] = false;
 			if(gridN[i][j]== 103 || gridN[i][j] == 2 || gridN[i][j] == 3)
-			gridAlive[i][j] = true;
-
-			*/
+				gridA[i][j] = true;
+			
 		}
 	}
-
-
 }
 
 int population(bool gridA[][m]) {
