@@ -57,6 +57,13 @@ void initialize(bool gridA[][m], bool gridB[][m]) {
 void initializeRandom(bool gridA[][m], bool gridB[][m]) {
 	srand(time(0));
 
+	for (int i = 0; i < m; i++) {
+		for (int j = 0; j < n; j++) {
+			gridA[i][j] = false;
+			gridB[i][j] = false;
+		}
+	}
+
 	int den;
 	cout << "What is the density?" << endl;
 	cin >> den;
@@ -84,6 +91,7 @@ int calcN(const int a, const int b, bool gridA[][m]) {
 	int overA = 100, underA = 100;
 	int overB = 100, underB = 100;
 
+	//check overflow condition for a,b
 	if (a + 1 == 10) {
 		overA = 0;
 	}
@@ -97,6 +105,7 @@ int calcN(const int a, const int b, bool gridA[][m]) {
 		underB = 9;
 	}
 
+	//no overflow option
 	if (overA == 100 && underA == 100 && overB == 100 && underB == 100) {
 		for (int i = a - 1; i <= a + 1; i++) {
 			for (int j = b - 1; j <= b + 1; j++) {
@@ -106,6 +115,7 @@ int calcN(const int a, const int b, bool gridA[][m]) {
 			}
 		}
 	}
+	//a over
 	else if (overA == 0 && underA == 100 && overB == 100 && underB == 100) {
 		//1000
 		//8,9,0->a
@@ -123,6 +133,7 @@ int calcN(const int a, const int b, bool gridA[][m]) {
 			}
 		}
 	}
+	//a under
 	else if (overA == 100 && underA == 9 && overB == 100 && underB == 100) {
 		//0100
 		//9,0,1->a
@@ -140,6 +151,7 @@ int calcN(const int a, const int b, bool gridA[][m]) {
 			}
 		}
 	}
+	//b overflow
 	else if (overA == 100 && underA == 100 && overB == 0 && underB == 100) {
 		//0010
 		//8,9,0->b
@@ -157,6 +169,7 @@ int calcN(const int a, const int b, bool gridA[][m]) {
 			}
 		}
 	}
+	//b under
 	else if (overA == 100 && underA == 100 && overB == 100 && underB == 9) {
 		//0001
 		//9,0,1
@@ -174,6 +187,7 @@ int calcN(const int a, const int b, bool gridA[][m]) {
 			}
 		}
 	}
+	// a&b over
 	else if (overA == 0 && underA == 100 && overB == 0 && underB == 100) {
 		//1010
 		//8,9,0->a
@@ -202,6 +216,7 @@ int calcN(const int a, const int b, bool gridA[][m]) {
 
 		}
 	}
+	//a over, b under
 	else if (overA == 0 && underA == 100 && overB == 100 && underB == 9) {
 		//1001
 		//8,9,0->a
@@ -233,6 +248,7 @@ int calcN(const int a, const int b, bool gridA[][m]) {
 			}
 		}
 	}
+	//a&b under
 	else if (overA == 100 && underA == 9 && overB == 100 && underB == 9) {
 		//0101
 		//9,0,1->a
@@ -269,6 +285,7 @@ int calcN(const int a, const int b, bool gridA[][m]) {
 			}
 		}
 	}
+	//a under, b over
 	else if (overA == 100 && underA == 9 && overB == 0 && underB == 100) {
 		//0110
 		//9,0,1->a
@@ -304,6 +321,8 @@ int calcN(const int a, const int b, bool gridA[][m]) {
 	return sum;
 }
 
+//function to print the neighbor values for grid
+//useful for debuging
 void printN(int grid[][m]) {
 	for (int i = 0; i < n; i++) {
 		for (int j = 0; j < m; j++) {
@@ -313,7 +332,7 @@ void printN(int grid[][m]) {
 	}
 }
 
-//
+//function to calculate the neighbor value of each cell
 void generateCell(int gridN[][m], bool gridA[][m]) {
 
 	for (int i = 0; i < n; i++) {
@@ -329,7 +348,7 @@ void generateCell(int gridN[][m], bool gridA[][m]) {
 	//printN(gridN);
 }
 
-//
+//function to create next generation with values of generated cells
 void newGen(int gridN[][m], bool gridA[][m]) {
 
 	for (int i = 0; i < n; i++) {
@@ -342,6 +361,7 @@ void newGen(int gridN[][m], bool gridA[][m]) {
 	}
 }
 
+//function to calculate the population in the given 2D array
 int population(bool gridA[][m]) {
 	int pop = 0;
 
@@ -355,7 +375,7 @@ int population(bool gridA[][m]) {
 	return pop;
 }
 
-
+//function to print the grid 
 void print(bool gridA[][m]) {
 	for (int i = 0; i < n; i++) {
 		for (int j = 0; j < m; j++) {
@@ -368,6 +388,7 @@ void print(bool gridA[][m]) {
 	}
 }
 
+//function to check if all cells are dead
 bool allDead(bool gridA[][m]) {
 
 	for (int i = 0; i < n; i++) {
@@ -379,6 +400,7 @@ bool allDead(bool gridA[][m]) {
 	return true;
 }
 
+//function to check if prev generation = next generation
 bool sameGrid(bool gridGen1[][m], bool gridGen2[][m]) {
 
 	for (int i = 0; i < n; i++) {
@@ -390,6 +412,7 @@ bool sameGrid(bool gridGen1[][m], bool gridGen2[][m]) {
 	return true;
 }
 
+//function to copy prev grid to compare
 void copyGrid(bool a[][m], bool b[][m]) {
 	for (int i = 0; i < m; i++) {
 		for (int j = 0; j < n; j++) {
@@ -409,6 +432,7 @@ int main() {
 	bool valid = false;
 
 	char inp;
+	//prompt user to enter values.
 	cout << "How do you want to setup the grid?" << endl;
 	cout << "A. manual input" << endl;
 	cout << "B. random generation" << endl;
@@ -432,18 +456,20 @@ int main() {
 
 	int gen = 0;
 	
+	//main loop to run the game
 	while (valid) {
 		cout << "This is generation " << gen << endl;
 		print(gridAlive);
 		int prevPop = population(gridAlive);
 		gridPop[gen] = prevPop;
 		cout << "Total population is " << prevPop << endl;
+		copyGrid(gridAlive, gridPrev);
 		generateCell(gridN, gridAlive);
 		newGen(gridN, gridAlive);
 		if (gen == MAXGEN) {
 			valid = false;
 		}
-		else if (allDead(gridAlive)) {
+		else if (allDead(gridPrev)) {
 			valid = false;
 			cout << "All dead at generation " << gen + 1 << endl;
 		}
@@ -453,15 +479,14 @@ int main() {
 			print(gridAlive);
 		}		
 		else if (gen > 4) {
-			if (gridPop[gen - 3] == gridPop[gen - 2] && gridPop[gen - 2] == gridPop[gen - 1] && gridPop[gen]) {
+			if (gridPop[gen - 3] == gridPop[gen - 2] && gridPop[gen - 2] == gridPop[gen - 1] && gridPop[gen-1] == gridPop[gen]) {
 				valid = false;
 				cout << "Population stable at generation " << gen-3 << endl;
 				cout << "Population of the previous 3 generations is " << population(gridAlive) << endl;
 			}			
 		}
 		
-		gen++;
-		copyGrid(gridAlive, gridPrev);
+		gen++;		
 	}
 
 	system("Pause");
