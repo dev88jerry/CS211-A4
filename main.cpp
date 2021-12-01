@@ -18,7 +18,6 @@ else gridN[i][j] == 1 or 4 -> gridAlive[i][j] = 0
 #include <string>
 #include <ctime>
 #include <cstdlib>
-#include <algorithm>
 
 using namespace std;
 
@@ -28,7 +27,7 @@ const int n = 10;    // no. of rows
 const int m = 10;    // no. of colums
 
 void initialize(bool gridA[][m], bool gridB[][m]) {
-	
+
 	for (int i = 0; i < m; i++) {
 		for (int j = 0; j < n; j++) {
 			gridA[i][j] = false;
@@ -204,8 +203,6 @@ int calcN(const int a, const int b, bool gridA[][m]) {
 		}
 	}
 	else if (overA == 0 && underA == 100 && overB == 100 && underB == 9) {
-		/**************************************************/
-		//bug at top corner 9,0
 		//1001
 		//8,9,0->a
 		//9,0,1->b
@@ -304,44 +301,16 @@ int calcN(const int a, const int b, bool gridA[][m]) {
 		}
 	}
 
-	/*
-	in a normal case were 0 > a--/a++ or b--/b++ > 10
-	if(gridAlive[a-1][b-1] == true)
-	sum++;
-	else if(gridAlive[a-1][b] == true)
-	sum++;
-	a--,b
-	else if(gridAlive[a-1][b+1] == true)
-	sum++;
-	a--,b++
-	else if(gridAlive[a][b-1] == true)
-	sum++;
-	a,b--
-	a,b-> no need to check
-	else if(gridAlive[a][b+1] == true)
-	sum++;
-	a,b++
-	else if(gridAlive[a+1][b-1] == true)
-	sum++;
-	a++,b--
-	else if(gridAlive[a+1][b] == true)
-	sum++;
-	a++,b
-	else if(gridAlive[a+1][b+1] == true)
-	sum++;
-	a++,b++
-
-	if a-- or b-- < 0
-	set a,b = 9
-
-	if a++ or b++ == 10
-	set a,b = 0
-
-	after each condition, if gridAlive == true sum++
-
-	*/
-
 	return sum;
+}
+
+void printN(int grid[][m]) {
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < m; j++) {
+			cout << grid[i][j] << " , ";
+		}
+		cout << endl;
+	}
 }
 
 //
@@ -357,6 +326,7 @@ void generateCell(int gridN[][m], bool gridA[][m]) {
 				gridN[i][j] = neighbor + 100;
 		}
 	}
+	//printN(gridN);
 }
 
 //
@@ -420,12 +390,21 @@ bool sameGrid(bool gridGen1[][m], bool gridGen2[][m]) {
 	return true;
 }
 
+void copyGrid(bool a[][m], bool b[][m]) {
+	for (int i = 0; i < m; i++) {
+		for (int j = 0; j < n; j++) {
+			b[i][j] = a[i][j];
+		}
+	}
+}
+
 
 int main() {
 
 	bool gridAlive[m][n];
-	bool prevGrid[m][n];
+	bool gridPrev[m][n];
 	int gridN[m][n];
+	int gridPop[MAXGEN];
 
 	bool valid = false;
 
@@ -439,11 +418,11 @@ int main() {
 	switch (tolower(inp))
 	{
 	case 'a':
-		initialize(gridAlive, prevGrid);
+		initialize(gridAlive, gridPrev);
 		valid = true;
 		break;
 	case 'b':
-		initializeRandom(gridAlive, prevGrid);
+		initializeRandom(gridAlive, gridPrev);
 		valid = true;
 		break;
 	default:
@@ -452,15 +431,12 @@ int main() {
 	}
 
 	int gen = 0;
-
-	// user another 2d array to put the bool t/f
-	// then compare if the 2 arrays are the same
-
-	int pop2nd = 0;
+	
 	while (valid) {
 		cout << "This is generation " << gen << endl;
 		print(gridAlive);
 		int prevPop = population(gridAlive);
+		gridPop[gen] = prevPop;
 		cout << "Total population is " << prevPop << endl;
 		generateCell(gridN, gridAlive);
 		newGen(gridN, gridAlive);
@@ -471,38 +447,22 @@ int main() {
 			valid = false;
 			cout << "All dead at generation " << gen + 1 << endl;
 		}
-		else if (sameGrid(gridAlive, prevGrid)) {
+		else if (sameGrid(gridAlive, gridPrev)) {
 			valid = false;
 			cout << "Grid is stable at " << gen + 1 << endl;
 			print(gridAlive);
+		}		
+		else if (gen > 4) {
+			if (gridPop[gen - 3] == gridPop[gen - 2] && gridPop[gen - 2] == gridPop[gen - 1] && gridPop[gen]) {
+				valid = false;
+				cout << "Population stable at generation " << gen-3 << endl;
+				cout << "Population of the previous 3 generations is " << population(gridAlive) << endl;
+			}			
 		}
-		/*
-		else if (pop2nd == prevPop && prevPop == population(gridAlive)) {
-			valid = false;
-			cout << "Population stable at generation " << gen << endl;
-			cout << "Population next gen is " << population(gridAlive) << endl;
-		}
-		*/
+		
 		gen++;
-		pop2nd = prevPop;
-		copy(&gridAlive[0][0], &gridAlive[0][0] + m*n, &prevGrid[0][0]);
+		copyGrid(gridAlive, gridPrev);
 	}
-
-
-	/*
-	initialize(grid);     // you should call either initialize, or initialize2
-	cout << "Initial population = \n";
-	print(grid);
-	gen = 1;
-	print(grid);
-	while (gen <= MAXGEN && !allDead(grid)) {
-	cout << "gen = " << gen;
-	reproduce(grid);    // will call the function countNeighbours for each cell
-	print(grid);
-	gen++;
-	}
-	*/
-
 
 	system("Pause");
 
