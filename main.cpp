@@ -18,15 +18,24 @@ else gridN[i][j] == 1 or 4 -> gridAlive[i][j] = 0
 #include <string>
 #include <ctime>
 #include <cstdlib>
+#include <algorithm>
 
 using namespace std;
 
 // Global constants
-const int MAXGEN = 3; // maximum no. of generations
+const int MAXGEN = 100; // maximum no. of generations
 const int n = 10;    // no. of rows 
 const int m = 10;    // no. of colums
 
-void initialize(bool gridA[][m]) {
+void initialize(bool gridA[][m], bool gridB[][m]) {
+	
+	for (int i = 0; i < m; i++) {
+		for (int j = 0; j < n; j++) {
+			gridA[i][j] = false;
+			gridB[i][j] = false;
+		}
+	}
+
 	int alive;
 	cout << "Enter the total cells that are alive" << endl;
 	cin >> alive;
@@ -46,7 +55,7 @@ void initialize(bool gridA[][m]) {
 
 }
 
-void initializeRandom(bool gridA[][m]) {
+void initializeRandom(bool gridA[][m], bool gridB[][m]) {
 	srand(time(0));
 
 	int den;
@@ -56,6 +65,7 @@ void initializeRandom(bool gridA[][m]) {
 	for (int i = 0; i < n; i++) {
 		for (int j = 0; j < m; j++) {
 			gridA[i][j] = false;
+			gridB[i][j] = false;
 			int randN = (rand() % 100) + 1;
 			if (randN <= den) {
 				//populate cell				
@@ -91,7 +101,7 @@ int calcN(const int a, const int b, bool gridA[][m]) {
 	if (overA == 100 && underA == 100 && overB == 100 && underB == 100) {
 		for (int i = a - 1; i <= a + 1; i++) {
 			for (int j = b - 1; j <= b + 1; j++) {
-				if (gridA[i][j] == true && i != a && j != b) {
+				if (gridA[i][j] == true && (i != a || j != b)) {
 					sum++;
 				}
 			}
@@ -102,14 +112,14 @@ int calcN(const int a, const int b, bool gridA[][m]) {
 		//8,9,0->a
 		for (int i = a - 1; i <= a; i++) {
 			for (int j = b - 1; j <= b + 1; j++) {
-				if (gridA[i][j] == true && i != a && j != b) {
+				if (gridA[i][j] == true && (i != a || j != b)) {
 					sum++;
 				}
 			}
 		}
 		for (int j = b - 1; j <= b + 1; j++) {
 			int i = overA;
-			if (gridA[i][j] == true && i != a && j != b) {
+			if (gridA[i][j] == true && (i != a || j != b)) {
 				sum++;
 			}
 		}
@@ -119,14 +129,14 @@ int calcN(const int a, const int b, bool gridA[][m]) {
 		//9,0,1->a
 		for (int i = a; i <= a + 1; i++) {
 			for (int j = b - 1; j <= b + 1; j++) {
-				if (gridA[i][j] == true && i != a && j != b) {
+				if (gridA[i][j] == true && (i != a || j != b)) {
 					sum++;
 				}
 			}
 		}
 		for (int j = b - 1; j <= b + 1; j++) {
 			int i = underA;
-			if (gridA[i][j] == true && i != a && j != b) {
+			if (gridA[i][j] == true && (i != a || j != b)) {
 				sum++;
 			}
 		}
@@ -136,14 +146,14 @@ int calcN(const int a, const int b, bool gridA[][m]) {
 		//8,9,0->b
 		for (int i = a - 1; i <= a + 1; i++) {
 			for (int j = b - 1; j <= b; j++) {
-				if (gridA[i][j] == true && i != a && j != b) {
+				if (gridA[i][j] == true && (i != a || j != b)) {
 					sum++;
 				}
 			}
 		}
 		for (int i = a - 1; i <= a + 1; i++) {
 			int j = overB;
-			if (gridA[i][j] == true && i != a && j != b) {
+			if (gridA[i][j] == true && (i != a || j != b)) {
 				sum++;
 			}
 		}
@@ -153,14 +163,14 @@ int calcN(const int a, const int b, bool gridA[][m]) {
 		//9,0,1
 		for (int i = a - 1; i <= a + 1; i++) {
 			for (int j = b; j <= b + 1; j++) {
-				if (gridA[i][j] == true && i != a && j != b) {
+				if (gridA[i][j] == true && (i != a || j != b)) {
 					sum++;
 				}
 			}
 		}
 		for (int i = a - 1; i <= a + 1; i++) {
 			int j = underB;
-			if (gridA[i][j] == true && i != a && j != b) {
+			if (gridA[i][j] == true && (i != a || j != b)) {
 				sum++;
 			}
 		}
@@ -169,12 +179,62 @@ int calcN(const int a, const int b, bool gridA[][m]) {
 		//1010
 		//8,9,0->a
 		//8,9,0->b
-	}
 
+		for (int i = a - 1; i <= a + 1; i++) {
+			for (int j = b - 1; j <= b + 1; j++) {
+				if (j == 10 && i == 10) {
+					if (gridA[overA][overB] == true)
+						sum++;
+				}
+				else if (i == 10 && j != 10) {
+					if (gridA[overA][j] == true)
+						sum++;
+				}
+				else if (j == 10 && i != 10) {
+					if (gridA[i][overB] == true)
+						sum++;
+				}
+				else {
+					if (gridA[i][j] == true && (i != a || j != b))
+						sum++;
+				}
+
+			}
+
+		}
+	}
 	else if (overA == 0 && underA == 100 && overB == 100 && underB == 9) {
+		/**************************************************/
+		//bug at top corner 9,0
 		//1001
 		//8,9,0->a
 		//9,0,1->b
+		for (int i = a - 1; i <= a + 1; i++) {
+			if (i == 10) {
+				for (int j = b - 1; j <= b + 1; j++) {
+					if (j == -1) {
+						if (gridA[overA][underB] == true)
+							sum++;
+					}
+					else {
+						if (gridA[overA][j] == true)
+							sum++;
+					}
+				}
+			}
+			else {
+				for (int j = b - 1; j <= b + 1; j++) {
+					if (j == -1) {
+						if (gridA[i][underB] == true)
+							sum++;
+					}
+					else {
+						if (gridA[i][j] == true && (i != a || j != b))
+							sum++;
+					}
+				}
+			}
+		}
 	}
 	else if (overA == 100 && underA == 9 && overB == 100 && underB == 9) {
 		//0101
@@ -185,9 +245,9 @@ int calcN(const int a, const int b, bool gridA[][m]) {
 		0,9->0,0->0,1
 		1,9->1,0->1,1
 		*/
-		for (int i = -1; i <= 1; i++) {
-			if (i == -1) {				
-				for (int j = -1; j <= 1; j++) {
+		for (int i = a - 1; i <= a + 1; i++) {
+			if (i == -1) {
+				for (int j = b - 1; j <= b + 1; j++) {
 					if (j == -1) {
 						if (gridA[underA][underB] == true)
 							sum++;
@@ -195,17 +255,17 @@ int calcN(const int a, const int b, bool gridA[][m]) {
 					else {
 						if (gridA[underA][j] == true)
 							sum++;
-					}					
+					}
 				}
 			}
 			else {
-				for (int j = -1; j <= 1; j++) {
+				for (int j = b - 1; j <= b + 1; j++) {
 					if (j == -1) {
 						if (gridA[i][underB] == true)
 							sum++;
 					}
 					else {
-						if (gridA[i][j] == true)
+						if (gridA[i][j] == true && (i != a || j != b))
 							sum++;
 					}
 				}
@@ -216,14 +276,9 @@ int calcN(const int a, const int b, bool gridA[][m]) {
 		//0110
 		//9,0,1->a
 		//8,9,0->b
-		/*
-		9,8->9,9->9,0
-		0,8->0,9->0,0
-		1,8->1,9->1,0
-		*/
-		for (int i = -1; i <= 1; i++) {
+		for (int i = a - 1; i <= a + 1; i++) {
 			if (i == -1) {
-				for (int j = 8; j <= 10; j++) {
+				for (int j = b - 1; j <= b + 1; j++) {
 					if (j == 10) {
 						if (gridA[underA][overB] == true)
 							sum++;
@@ -235,13 +290,13 @@ int calcN(const int a, const int b, bool gridA[][m]) {
 				}
 			}
 			else {
-				for (int j = 8; j <= 10; j++) {
+				for (int j = b - 1; j <= b + 1; j++) {
 					if (j == 10) {
 						if (gridA[i][overB] == true)
 							sum++;
 					}
 					else {
-						if (gridA[i][j] == true)
+						if (gridA[i][j] == true && (i != a || j != b))
 							sum++;
 					}
 				}
@@ -294,8 +349,8 @@ void generateCell(int gridN[][m], bool gridA[][m]) {
 
 	for (int i = 0; i < n; i++) {
 		for (int j = 0; j < m; j++) {
-			int neighbor = calcN(i, j, gridA);			
-			gridN[i][j]= 0;
+			int neighbor = calcN(i, j, gridA);
+			gridN[i][j] = 0;
 			if (gridA[i][j] == true)
 				gridN[i][j] = neighbor;
 			else
@@ -308,11 +363,11 @@ void generateCell(int gridN[][m], bool gridA[][m]) {
 void newGen(int gridN[][m], bool gridA[][m]) {
 
 	for (int i = 0; i < n; i++) {
-		for (int j = 0; j < m; j++) {			
+		for (int j = 0; j < m; j++) {
 			gridA[i][j] = false;
-			if(gridN[i][j]== 103 || gridN[i][j] == 2 || gridN[i][j] == 3)
+			if (gridN[i][j] == 103 || gridN[i][j] == 2 || gridN[i][j] == 3)
 				gridA[i][j] = true;
-			
+
 		}
 	}
 }
@@ -343,9 +398,33 @@ void print(bool gridA[][m]) {
 	}
 }
 
+bool allDead(bool gridA[][m]) {
+
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < m; j++) {
+			if (gridA[i][j] == true)
+				return false;
+		}
+	}
+	return true;
+}
+
+bool sameGrid(bool gridGen1[][m], bool gridGen2[][m]) {
+
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < m; j++) {
+			if (gridGen1[i][j] != gridGen2[i][j])
+				return false;
+		}
+	}
+	return true;
+}
+
+
 int main() {
 
 	bool gridAlive[m][n];
+	bool prevGrid[m][n];
 	int gridN[m][n];
 
 	bool valid = false;
@@ -357,14 +436,14 @@ int main() {
 	cout << "Enter your choice:" << endl;
 	cin >> inp;
 
-	switch (inp)
+	switch (tolower(inp))
 	{
-	case 'A': case 'a':
-		initialize(gridAlive);
+	case 'a':
+		initialize(gridAlive, prevGrid);
 		valid = true;
 		break;
-	case 'B': case 'b':
-		initializeRandom(gridAlive);
+	case 'b':
+		initializeRandom(gridAlive, prevGrid);
 		valid = true;
 		break;
 	default:
@@ -372,9 +451,41 @@ int main() {
 		break;
 	}
 
-	if (valid) {
+	int gen = 0;
+
+	// user another 2d array to put the bool t/f
+	// then compare if the 2 arrays are the same
+
+	int pop2nd = 0;
+	while (valid) {
+		cout << "This is generation " << gen << endl;
 		print(gridAlive);
-		cout << "Total population is " << population(gridAlive) << endl;
+		int prevPop = population(gridAlive);
+		cout << "Total population is " << prevPop << endl;
+		generateCell(gridN, gridAlive);
+		newGen(gridN, gridAlive);
+		if (gen == MAXGEN) {
+			valid = false;
+		}
+		else if (allDead(gridAlive)) {
+			valid = false;
+			cout << "All dead at generation " << gen + 1 << endl;
+		}
+		else if (sameGrid(gridAlive, prevGrid)) {
+			valid = false;
+			cout << "Grid is stable at " << gen + 1 << endl;
+			print(gridAlive);
+		}
+		/*
+		else if (pop2nd == prevPop && prevPop == population(gridAlive)) {
+			valid = false;
+			cout << "Population stable at generation " << gen << endl;
+			cout << "Population next gen is " << population(gridAlive) << endl;
+		}
+		*/
+		gen++;
+		pop2nd = prevPop;
+		copy(&gridAlive[0][0], &gridAlive[0][0] + m*n, &prevGrid[0][0]);
 	}
 
 
