@@ -18,6 +18,7 @@ else gridN[i][j] == 1 or 4 -> gridAlive[i][j] = 0
 #include <string>
 #include <ctime>
 #include <cstdlib>
+#include <cmath>
 
 using namespace std;
 
@@ -85,12 +86,38 @@ void initializeRandom(bool gridA[][m], bool gridB[][m]) {
 /*
 check the 9 tile for a given cell location
 returns the number of neighbors
+
+use mod to ensure values are in our conditions
 */
 int calcN(const int a, const int b, bool gridA[][m]) {
 	int sum = 0;
+	
+	
+	for (int i = a - 1; i <= a + 1; i++) {
+		for (int j = b - 1; j <= b + 1; j++) {
+			if (i == -1 && j == -1) {
+				if (gridA[m - 1][n - 1] == true)
+					sum++;
+			}
+			else if (i == -1) {
+				if (gridA[m - 1][j%n] == true)
+					sum++;
+			}
+			else if (j == -1) {
+				if (gridA[i%n][n - 1] == true)
+					sum++;
+			}
+			else if (gridA[i%m][j%n] == true && (i != a || j != b)) {
+				sum++;
+			}
+				
+		}
+	}
+	
+
+	/*
 	int overA = 100, underA = 100;
 	int overB = 100, underB = 100;
-
 	//check overflow condition for a,b
 	if (a + 1 == 10) {
 		overA = 0;
@@ -98,7 +125,8 @@ int calcN(const int a, const int b, bool gridA[][m]) {
 	else if (a - 1 == -1) {
 		underA = 9;
 	}
-	else if (b + 1 == 10) {
+	
+	if (b + 1 == 10) {
 		overB = 0;
 	}
 	else if (b - 1 == -1) {
@@ -253,11 +281,11 @@ int calcN(const int a, const int b, bool gridA[][m]) {
 		//0101
 		//9,0,1->a
 		//9,0,1->b
-		/*
-		9,9->9,0->9,1
-		0,9->0,0->0,1
-		1,9->1,0->1,1
-		*/
+
+		//9,9->9,0->9,1
+		//0,9->0,0->0,1
+		//1,9->1,0->1,1
+
 		for (int i = a - 1; i <= a + 1; i++) {
 			if (i == -1) {
 				for (int j = b - 1; j <= b + 1; j++) {
@@ -317,7 +345,7 @@ int calcN(const int a, const int b, bool gridA[][m]) {
 			}
 		}
 	}
-
+	*/
 	return sum;
 }
 
@@ -455,8 +483,9 @@ int main() {
 	}
 
 	int gen = 0;
-	
+
 	//main loop to run the game
+	
 	while (valid) {
 		cout << "This is generation " << gen << endl;
 		print(gridAlive);
@@ -477,18 +506,19 @@ int main() {
 			valid = false;
 			cout << "Grid is stable at " << gen + 1 << endl;
 			print(gridAlive);
-		}		
+		}
 		else if (gen > 4) {
-			if (gridPop[gen - 3] == gridPop[gen - 2] && gridPop[gen - 2] == gridPop[gen - 1] && gridPop[gen-1] == gridPop[gen]) {
+			if (gridPop[gen - 3] == gridPop[gen - 2] && gridPop[gen - 2] == gridPop[gen - 1] && gridPop[gen - 1] == gridPop[gen]) {
 				valid = false;
-				cout << "Population stable at generation " << gen-3 << endl;
+				cout << "Population stable at generation " << gen - 3 << endl;
 				cout << "Population of the previous 3 generations is " << population(gridAlive) << endl;
-			}			
+			}
 		}
 		
-		gen++;		
+		gen++;
+		cout << endl;
 	}
-
+		
 	system("Pause");
 
 	return 0;
