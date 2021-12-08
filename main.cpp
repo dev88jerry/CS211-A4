@@ -7,18 +7,13 @@ Program simulates Conway's Game of Life
 
 All cells should have 8 neighbours, even the ones on the border. For this purpose, the 2-dim array is considered as if it was wrapped around, or a sort of sphere.
 
-bool gridAlive to determine the living cells
-int gridN to determine the neighbours
-if(gridN[i][j] == 2 or 3) -> populate gridAlive[i][j] = 1
-else gridN[i][j] == 1 or 4 -> gridAlive[i][j] = 0
-
 */
 
 #include <iostream>
 #include <string>
 #include <ctime>
 #include <cstdlib>
-#include <cmath>
+
 
 using namespace std;
 
@@ -26,6 +21,20 @@ using namespace std;
 const int MAXGEN = 100; // maximum no. of generations
 const int n = 10;    // no. of rows 
 const int m = 10;    // no. of colums
+
+//function to print the grid 
+void print(bool gridA[][m]) {
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < m; j++) {
+			if (gridA[i][j] == true)
+				cout << "X ";
+			else
+				cout << "_ ";
+		}
+		cout << endl;
+	}
+}
+
 
 void initialize(bool gridA[][m], bool gridB[][m]) {
 
@@ -51,6 +60,32 @@ void initialize(bool gridA[][m], bool gridB[][m]) {
 			cout << i + 1 << " cell entered" << endl;
 		} while ((x < 0 || x >= 10) && (y < 0 || y >= 10));
 		gridA[x][y] = true;
+		print(gridA);
+	}
+
+}
+
+void initializeChars(bool gridA[][m], bool gridB[][m]) {
+
+	for (int i = 0; i < m; i++) {
+		for (int j = 0; j < n; j++) {
+			gridA[i][j] = false;
+			gridB[i][j] = false;
+		}
+	}
+
+	string inp;
+
+	cout << "Enter the string of 0,1 to indicate the status of the cells" << endl;
+	cin >> inp;
+
+	for (size_t i = 0; i < inp.length(); ++i) {
+		if (inp.at(i) == '1') {
+			gridA[i/m][i%n] = true;
+		}
+		else {
+			gridA[i/m][i%n] = false;
+		}
 	}
 
 }
@@ -91,8 +126,8 @@ use mod to ensure values are in our conditions
 */
 int calcN(const int a, const int b, bool gridA[][m]) {
 	int sum = 0;
-	
-	
+
+
 	for (int i = a - 1; i <= a + 1; i++) {
 		for (int j = b - 1; j <= b + 1; j++) {
 			if (i == -1 && j == -1) {
@@ -110,242 +145,9 @@ int calcN(const int a, const int b, bool gridA[][m]) {
 			else if (gridA[i%m][j%n] == true && (i != a || j != b)) {
 				sum++;
 			}
-				
 		}
-	}
-	
-
-	/*
-	int overA = 100, underA = 100;
-	int overB = 100, underB = 100;
-	//check overflow condition for a,b
-	if (a + 1 == 10) {
-		overA = 0;
-	}
-	else if (a - 1 == -1) {
-		underA = 9;
-	}
-	
-	if (b + 1 == 10) {
-		overB = 0;
-	}
-	else if (b - 1 == -1) {
-		underB = 9;
 	}
 
-	//no overflow option
-	if (overA == 100 && underA == 100 && overB == 100 && underB == 100) {
-		for (int i = a - 1; i <= a + 1; i++) {
-			for (int j = b - 1; j <= b + 1; j++) {
-				if (gridA[i][j] == true && (i != a || j != b)) {
-					sum++;
-				}
-			}
-		}
-	}
-	//a over
-	else if (overA == 0 && underA == 100 && overB == 100 && underB == 100) {
-		//1000
-		//8,9,0->a
-		for (int i = a - 1; i <= a; i++) {
-			for (int j = b - 1; j <= b + 1; j++) {
-				if (gridA[i][j] == true && (i != a || j != b)) {
-					sum++;
-				}
-			}
-		}
-		for (int j = b - 1; j <= b + 1; j++) {
-			int i = overA;
-			if (gridA[i][j] == true && (i != a || j != b)) {
-				sum++;
-			}
-		}
-	}
-	//a under
-	else if (overA == 100 && underA == 9 && overB == 100 && underB == 100) {
-		//0100
-		//9,0,1->a
-		for (int i = a; i <= a + 1; i++) {
-			for (int j = b - 1; j <= b + 1; j++) {
-				if (gridA[i][j] == true && (i != a || j != b)) {
-					sum++;
-				}
-			}
-		}
-		for (int j = b - 1; j <= b + 1; j++) {
-			int i = underA;
-			if (gridA[i][j] == true && (i != a || j != b)) {
-				sum++;
-			}
-		}
-	}
-	//b overflow
-	else if (overA == 100 && underA == 100 && overB == 0 && underB == 100) {
-		//0010
-		//8,9,0->b
-		for (int i = a - 1; i <= a + 1; i++) {
-			for (int j = b - 1; j <= b; j++) {
-				if (gridA[i][j] == true && (i != a || j != b)) {
-					sum++;
-				}
-			}
-		}
-		for (int i = a - 1; i <= a + 1; i++) {
-			int j = overB;
-			if (gridA[i][j] == true && (i != a || j != b)) {
-				sum++;
-			}
-		}
-	}
-	//b under
-	else if (overA == 100 && underA == 100 && overB == 100 && underB == 9) {
-		//0001
-		//9,0,1
-		for (int i = a - 1; i <= a + 1; i++) {
-			for (int j = b; j <= b + 1; j++) {
-				if (gridA[i][j] == true && (i != a || j != b)) {
-					sum++;
-				}
-			}
-		}
-		for (int i = a - 1; i <= a + 1; i++) {
-			int j = underB;
-			if (gridA[i][j] == true && (i != a || j != b)) {
-				sum++;
-			}
-		}
-	}
-	// a&b over
-	else if (overA == 0 && underA == 100 && overB == 0 && underB == 100) {
-		//1010
-		//8,9,0->a
-		//8,9,0->b
-
-		for (int i = a - 1; i <= a + 1; i++) {
-			for (int j = b - 1; j <= b + 1; j++) {
-				if (j == 10 && i == 10) {
-					if (gridA[overA][overB] == true)
-						sum++;
-				}
-				else if (i == 10 && j != 10) {
-					if (gridA[overA][j] == true)
-						sum++;
-				}
-				else if (j == 10 && i != 10) {
-					if (gridA[i][overB] == true)
-						sum++;
-				}
-				else {
-					if (gridA[i][j] == true && (i != a || j != b))
-						sum++;
-				}
-
-			}
-
-		}
-	}
-	//a over, b under
-	else if (overA == 0 && underA == 100 && overB == 100 && underB == 9) {
-		//1001
-		//8,9,0->a
-		//9,0,1->b
-		for (int i = a - 1; i <= a + 1; i++) {
-			if (i == 10) {
-				for (int j = b - 1; j <= b + 1; j++) {
-					if (j == -1) {
-						if (gridA[overA][underB] == true)
-							sum++;
-					}
-					else {
-						if (gridA[overA][j] == true)
-							sum++;
-					}
-				}
-			}
-			else {
-				for (int j = b - 1; j <= b + 1; j++) {
-					if (j == -1) {
-						if (gridA[i][underB] == true)
-							sum++;
-					}
-					else {
-						if (gridA[i][j] == true && (i != a || j != b))
-							sum++;
-					}
-				}
-			}
-		}
-	}
-	//a&b under
-	else if (overA == 100 && underA == 9 && overB == 100 && underB == 9) {
-		//0101
-		//9,0,1->a
-		//9,0,1->b
-
-		//9,9->9,0->9,1
-		//0,9->0,0->0,1
-		//1,9->1,0->1,1
-
-		for (int i = a - 1; i <= a + 1; i++) {
-			if (i == -1) {
-				for (int j = b - 1; j <= b + 1; j++) {
-					if (j == -1) {
-						if (gridA[underA][underB] == true)
-							sum++;
-					}
-					else {
-						if (gridA[underA][j] == true)
-							sum++;
-					}
-				}
-			}
-			else {
-				for (int j = b - 1; j <= b + 1; j++) {
-					if (j == -1) {
-						if (gridA[i][underB] == true)
-							sum++;
-					}
-					else {
-						if (gridA[i][j] == true && (i != a || j != b))
-							sum++;
-					}
-				}
-			}
-		}
-	}
-	//a under, b over
-	else if (overA == 100 && underA == 9 && overB == 0 && underB == 100) {
-		//0110
-		//9,0,1->a
-		//8,9,0->b
-		for (int i = a - 1; i <= a + 1; i++) {
-			if (i == -1) {
-				for (int j = b - 1; j <= b + 1; j++) {
-					if (j == 10) {
-						if (gridA[underA][overB] == true)
-							sum++;
-					}
-					else {
-						if (gridA[underA][j] == true)
-							sum++;
-					}
-				}
-			}
-			else {
-				for (int j = b - 1; j <= b + 1; j++) {
-					if (j == 10) {
-						if (gridA[i][overB] == true)
-							sum++;
-					}
-					else {
-						if (gridA[i][j] == true && (i != a || j != b))
-							sum++;
-					}
-				}
-			}
-		}
-	}
-	*/
 	return sum;
 }
 
@@ -403,18 +205,6 @@ int population(bool gridA[][m]) {
 	return pop;
 }
 
-//function to print the grid 
-void print(bool gridA[][m]) {
-	for (int i = 0; i < n; i++) {
-		for (int j = 0; j < m; j++) {
-			if (gridA[i][j] == true)
-				cout << "X ";
-			else
-				cout << "_ ";
-		}
-		cout << endl;
-	}
-}
 
 //function to check if all cells are dead
 bool allDead(bool gridA[][m]) {
@@ -470,13 +260,25 @@ int main() {
 	switch (tolower(inp))
 	{
 	case 'a':
-		initialize(gridAlive, gridPrev);
+		char manual;
+		cout << "Which method do you want to use to setup the grid?" << endl;
+		cout << "A. coordinate system?" << endl;
+		cout << "B. string of 0,1?" << endl;
+		cin >> manual;
+		
+		if (tolower(manual) == 'a')
+			initialize(gridAlive, gridPrev);
+		else
+			initializeChars(gridAlive, gridPrev);
+		
 		valid = true;
 		break;
+	
 	case 'b':
 		initializeRandom(gridAlive, gridPrev);
 		valid = true;
 		break;
+	
 	default:
 		cout << "Wrong choice\nGood Bye" << endl;
 		break;
@@ -485,7 +287,7 @@ int main() {
 	int gen = 0;
 
 	//main loop to run the game
-	
+
 	while (valid) {
 		cout << "This is generation " << gen << endl;
 		print(gridAlive);
@@ -514,11 +316,11 @@ int main() {
 				cout << "Population of the previous 3 generations is " << population(gridAlive) << endl;
 			}
 		}
-		
+
 		gen++;
 		cout << endl;
 	}
-		
+
 	system("Pause");
 
 	return 0;
